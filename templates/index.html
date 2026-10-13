@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ML_lab</title>
+    <style>
+        body { font-family: sans-serif; background: #f1f5f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 350px; }
+        input, button { width: 100%; padding: 10px; margin-top: 10px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; }
+        button { background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .result { margin-top: 15px; background: #f8fafc; padding: 10px; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>Предсказание цены и класса</h3>
+        <form id="form">
+            <label>Площадь (кв.м):</label>
+            <input type="number" id="area" value="85" required>
+
+            <label>Количество комнат:</label>
+            <input type="number" id="rooms" value="3" required>
+
+            <button type="submit">Рассчитать</button>
+        </form>
+
+        <div class="result" id="res">
+            <p> Цена: $<span id="price"></span> тыс.</p>
+            <p>🏷 Класс: <span id="category"></span> (<span id="prob"></span>%)</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new URLSearchParams();
+            formData.append('area', document.getElementById('area').value);
+            formData.append('rooms', document.getElementById('rooms').value);
+
+            const res = await fetch('/predict', { method: 'POST', body: formData });
+            const data = await res.json();
+
+            document.getElementById('price').innerText = data.price;
+            document.getElementById('category').innerText = data.class_label;
+            document.getElementById('prob').innerText = data.probability;
+            document.getElementById('res').style.display = 'block';
+        };
+    </script>
+</body>
+</html>
